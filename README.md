@@ -7,5 +7,5 @@ This project was created using Node v16 L.T.S, npm create vite@latest, using the
 The Moralis NFT API is used for the endpoint querries.
 
 # Production
-This project is live at the address below
-[htts://nft-lens.netlify.app](https://nft-lens.netlify.app)
+This project is live at this address:
+[https://nft-lens.netlify.app](https://nft-lens.netlify.app)
