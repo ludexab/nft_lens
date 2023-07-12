@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.nft_lens.app',
+  appId: 'io.ionic.starter',
   appName: 'nft_lens',
   webDir: 'dist',
   server: {
