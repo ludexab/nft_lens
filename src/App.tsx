@@ -1,12 +1,42 @@
 import { ethers } from "ethers";
 import { useState } from "react";
 import axios from "axios";
+import { MetaMaskSDK, MetaMaskSDKOptions } from "@metamask/sdk";
 
 const App = () => {
   const [account, setAccount] = useState(String);
   const [connected, setConnected] = useState(false);
   const [view, setView] = useState(Array);
   const [explore, setExplore] = useState(Array);
+
+  const options: MetaMaskSDKOptions = {
+    injectProvider: false,
+    dappMetadata: {},
+  };
+
+  const MMSDK = new MetaMaskSDK(options);
+
+  const connectMobileWallet = async () => {
+    // Get the Ethereum provider
+    const ethereum = MMSDK.getProvider();
+
+    // Check if MetaMask is available
+    if (ethereum) {
+      try {
+        // Request user accounts
+        const accounts: any = await ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setAccount(accounts[0]);
+        setConnected(true);
+        console.log("Connected to MetaMask. Accounts:", accounts);
+      } catch (error) {
+        console.error("Error connecting to MetaMask:", error);
+      }
+    } else {
+      console.error("MetaMask not available.");
+    }
+  };
 
   const ViewResult = ({
     name,
@@ -94,16 +124,16 @@ const App = () => {
     );
   };
 
-  const connectWallet = async () => {
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      setConnected(true);
-      setAccount(accounts[0]);
-    } else {
-      alert("Please install metamask");
-    }
-  };
+  // const connectWallet = async () => {
+  //   if (window.ethereum) {
+  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //     const accounts = await provider.send("eth_requestAccounts", []);
+  //     setConnected(true);
+  //     setAccount(accounts[0]);
+  //   } else {
+  //     alert("Please install metamask");
+  //   }
+  // };
 
   const viewNft = async () => {
     const address = document.getElementById(
@@ -170,14 +200,17 @@ const App = () => {
           {connected ? (
             <div className="button-div">
               <button
-                onClick={connectWallet}
+                onClick={connectMobileWallet}
                 className="connect-wallet"
               >{`${account.slice(0, 5)}...${account.slice(-4)}`}</button>
             </div>
           ) : (
             <div className="button-div">
-              <button onClick={connectWallet} className="connect-wallet">
+              {/* <button onClick={connectWallet} className="connect-wallet">
                 CONNECT WALLET
+              </button> */}
+              <button onClick={connectMobileWallet} className="connect-wallet">
+                Mobile CONNECT
               </button>
             </div>
           )}

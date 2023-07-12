@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">nft_lens</string>
+    <string name="title_activity_main">nft_lens</string>
+    <string name="package_name">com.nft_lens.app</string>
+    <string name="custom_url_scheme">com.nft_lens.app</string>
+</resources>
