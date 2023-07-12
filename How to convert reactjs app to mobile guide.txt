@@ -1,0 +1,31 @@
+How to convert react.js app to mobile app
+
+1. Install ionic
+-> npm install -g @ionic/cli
+
+2. Install capacitor
+-> npm install @capacitor/core @capacitor/cli
+
+3. Init capacitor
+-> npx cap init
+... follow the prompts
+
+4. Install capacitor android cli
+-> npm install @capacitor/android
+
+5. Init ionic
+-> ionic init
+
+6. Build our app
+-> ionic build
+
+7. Add android config files
+-> npx cap add android
+
+8. Open the android build folder using adroid studio and wait for android studio build to finish.
+
+9. Run the project using android studio.
+
+10. If build is successful, generate apk.
+
+11. The apk will be located in the release folder.
