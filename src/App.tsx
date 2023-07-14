@@ -1,37 +1,45 @@
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { MetaMaskSDK, MetaMaskSDKOptions } from "@metamask/sdk";
+import {
+  MetaMaskSDK,
+  MetaMaskSDKOptions,
+  CommunicationLayerPreference,
+} from "@metamask/sdk";
 
 const App = () => {
-  const [account, setAccount] = useState(String);
-  const [connected, setConnected] = useState(false);
   const [view, setView] = useState(Array);
   const [explore, setExplore] = useState(Array);
+  const [account, setAccount] = useState(String);
+  const [connected, setConnected] = useState(false);
 
   const options: MetaMaskSDKOptions = {
     injectProvider: false,
-    dappMetadata: {},
+    dappMetadata: { url: "https://nftlens.netlify.app", name: "NFT Lens" },
   };
-
   const MMSDK = new MetaMaskSDK(options);
 
+  const handleConnection = async () => {
+    await connectMobileWallet();
+  };
   const connectMobileWallet = async () => {
-    // Get the Ethereum provider
     const ethereum = MMSDK.getProvider();
+    // Get the Ethereum provider
 
     // Check if MetaMask is available
     if (ethereum) {
       try {
+        console.log("running connection");
         // Request user accounts
-        const accounts: any = await ethereum.request({
+        const accounts = await ethereum.request<string[]>({
           method: "eth_requestAccounts",
         });
-        setAccount(accounts[0]);
+        const acc: string | undefined = accounts?.[0] ?? undefined;
         setConnected(true);
+        setAccount(acc as string);
         console.log("Connected to MetaMask. Accounts:", accounts);
       } catch (error) {
-        console.error("Error connecting to MetaMask:", error);
+        console.error("Error occured", error);
       }
     } else {
       console.error("MetaMask not available.");
@@ -124,17 +132,6 @@ const App = () => {
     );
   };
 
-  // const connectWallet = async () => {
-  //   if (window.ethereum) {
-  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
-  //     const accounts = await provider.send("eth_requestAccounts", []);
-  //     setConnected(true);
-  //     setAccount(accounts[0]);
-  //   } else {
-  //     alert("Please install metamask");
-  //   }
-  // };
-
   const viewNft = async () => {
     const address = document.getElementById(
       "wallet-address"
@@ -192,6 +189,10 @@ const App = () => {
     }
   };
 
+  useEffect(() => {
+    setAccount(account);
+  }, [connected]);
+
   return (
     <>
       <header>
@@ -199,18 +200,15 @@ const App = () => {
           <h1 className="text-4xl font-bold">NFT Lens</h1>
           {connected ? (
             <div className="button-div">
-              <button
-                onClick={connectMobileWallet}
-                className="connect-wallet"
-              >{`${account.slice(0, 5)}...${account.slice(-4)}`}</button>
+              <button className="connect-wallet">{`${account.slice(
+                0,
+                5
+              )}...${account.slice(-4)}`}</button>
             </div>
           ) : (
             <div className="button-div">
-              {/* <button onClick={connectWallet} className="connect-wallet">
+              <button onClick={handleConnection} className="connect-wallet">
                 CONNECT WALLET
-              </button> */}
-              <button onClick={connectMobileWallet} className="connect-wallet">
-                Mobile CONNECT
               </button>
             </div>
           )}

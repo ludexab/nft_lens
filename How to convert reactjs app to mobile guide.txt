@@ -29,3 +29,6 @@ How to convert react.js app to mobile app
 10. If build is successful, generate apk.
 
 11. The apk will be located in the release folder.
+
+12. Making changes
+-> ionic capacitor sync android
