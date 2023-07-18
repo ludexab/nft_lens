@@ -6,7 +6,6 @@ import {
   MetaMaskSDKOptions,
   CommunicationLayerPreference,
 } from "@metamask/sdk";
-
 const App = () => {
   const [view, setView] = useState(Array);
   const [explore, setExplore] = useState(Array);
@@ -15,18 +14,21 @@ const App = () => {
 
   const options: MetaMaskSDKOptions = {
     injectProvider: false,
+    communicationLayerPreference: CommunicationLayerPreference.SOCKET,
     dappMetadata: { url: "https://nftlens.netlify.app", name: "NFT Lens" },
   };
+
   const MMSDK = new MetaMaskSDK(options);
 
   const handleConnection = async () => {
     await connectMobileWallet();
   };
   const connectMobileWallet = async () => {
-    const ethereum = MMSDK.getProvider();
     // Get the Ethereum provider
+    const ethereum = MMSDK.getProvider();
 
     // Check if MetaMask is available
+    console.log(ethereum);
     if (ethereum) {
       try {
         console.log("running connection");
@@ -34,6 +36,7 @@ const App = () => {
         const accounts = await ethereum.request<string[]>({
           method: "eth_requestAccounts",
         });
+
         const acc: string | undefined = accounts?.[0] ?? undefined;
         setConnected(true);
         setAccount(acc as string);
@@ -44,6 +47,27 @@ const App = () => {
     } else {
       console.error("MetaMask not available.");
     }
+  };
+
+  const sendEth = async () => {
+    const ethereum = MMSDK.getProvider();
+    const parsedAmount = ethers.utils.parseEther("0.01");
+    const addressTo = "0xe06D5eEDeab66A572283E1580CF464dE6d8508bb";
+
+    const tx = {
+      from: account,
+      to: addressTo,
+      gas: "0x5208", //21000 GWEI
+      value: parsedAmount._hex,
+    };
+
+    ethereum
+      .request<string[]>({
+        method: "eth_requestAccounts",
+      })
+      .then(() => {
+        ethereum.request({ method: "eth_sendTransaction", params: [tx] });
+      });
   };
 
   const ViewResult = ({
@@ -204,6 +228,9 @@ const App = () => {
                 0,
                 5
               )}...${account.slice(-4)}`}</button>
+              <button onClick={sendEth} className="connect-wallet">
+                Send
+              </button>
             </div>
           ) : (
             <div className="button-div">
