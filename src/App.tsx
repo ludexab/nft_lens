@@ -23,7 +23,7 @@ const App = () => {
   const handleConnection = async () => {
     await connectMobileWallet();
   };
-  const connectMobileWallet = async () => {
+  const connectMobileWallet = () => {
     // Get the Ethereum provider
     const ethereum = MMSDK.getProvider();
 
@@ -33,14 +33,23 @@ const App = () => {
       try {
         console.log("running connection");
         // Request user accounts
-        const accounts = await ethereum.request<string[]>({
-          method: "eth_requestAccounts",
-        });
-
-        const acc: string | undefined = accounts?.[0] ?? undefined;
-        setConnected(true);
-        setAccount(acc as string);
-        console.log("Connected to MetaMask. Accounts:", accounts);
+        ethereum
+          .request<string[]>({
+            method: "eth_requestAccounts",
+          })
+          .then((accounts) => {
+            const acc: string | undefined = accounts?.[0] ?? undefined;
+            setConnected(true);
+            setAccount(acc as string);
+            console.log("Connected to MetaMask. Accounts:", accounts);
+          })
+          .then(() => {
+            const targetNetworkId = 137;
+            ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: `0x${targetNetworkId.toString(16)}` }],
+            });
+          });
       } catch (error) {
         console.error("Error occured", error);
       }
