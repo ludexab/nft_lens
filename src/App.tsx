@@ -12,44 +12,21 @@ const App = () => {
   const [account, setAccount] = useState(String);
   const [connected, setConnected] = useState(false);
 
-  const options: MetaMaskSDKOptions = {
-    injectProvider: false,
-    communicationLayerPreference: CommunicationLayerPreference.SOCKET,
-    dappMetadata: { url: "https://nftlens.netlify.app", name: "NFT Lens" },
+  const handleConnection = () => {
+    connectMobileWallet();
   };
-
-  const MMSDK = new MetaMaskSDK(options);
-
-  const handleConnection = async () => {
-    await connectMobileWallet();
-  };
-  const connectMobileWallet = () => {
+  const connectMobileWallet = async () => {
     // Get the Ethereum provider
-    const ethereum = MMSDK.getProvider();
-
-    // Check if MetaMask is available
-    console.log(ethereum);
-    if (ethereum) {
+    if (window.ethereum) {
       try {
         console.log("running connection");
         // Request user accounts
-        ethereum
-          .request<string[]>({
-            method: "eth_requestAccounts",
-          })
-          .then((accounts) => {
-            const acc: string | undefined = accounts?.[0] ?? undefined;
-            setConnected(true);
-            setAccount(acc as string);
-            console.log("Connected to MetaMask. Accounts:", accounts);
-          })
-          .then(() => {
-            const targetNetworkId = 137;
-            ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: `0x${targetNetworkId.toString(16)}` }],
-            });
-          });
+
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setAccount(accounts[0]);
+        setConnected(true);
       } catch (error) {
         console.error("Error occured", error);
       }
@@ -59,7 +36,7 @@ const App = () => {
   };
 
   const sendEth = async () => {
-    const ethereum = MMSDK.getProvider();
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
     const parsedAmount = ethers.utils.parseEther("0.01");
     const addressTo = "0xe06D5eEDeab66A572283E1580CF464dE6d8508bb";
 
@@ -70,13 +47,12 @@ const App = () => {
       value: parsedAmount._hex,
     };
 
-    ethereum
-      .request<string[]>({
-        method: "eth_requestAccounts",
-      })
-      .then(() => {
-        ethereum.request({ method: "eth_sendTransaction", params: [tx] });
-      });
+    const tnx = await window.ethereum.request({
+      method: "eth_sendTransaction",
+      params: [tx],
+    });
+    tnx.wait();
+    console.log(tnx.hash, tnx);
   };
 
   const ViewResult = ({
@@ -237,9 +213,6 @@ const App = () => {
                 0,
                 5
               )}...${account.slice(-4)}`}</button>
-              <button onClick={sendEth} className="connect-wallet">
-                Send
-              </button>
             </div>
           ) : (
             <div className="button-div">
